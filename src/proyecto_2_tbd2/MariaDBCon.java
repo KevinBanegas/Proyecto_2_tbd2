@@ -43,6 +43,30 @@ public class MariaDBCon {
         }
     }
 
+    public Connection getCon() {
+        return con;
+    }
+
+    public void setCon(Connection con) {
+        this.con = con;
+    }
+
+    public String getBd() {
+        return bd;
+    }
+
+    public void setBd(String bd) {
+        this.bd = bd;
+    }
+
+    public ResultSet getBitacora() {
+        return bitacora;
+    }
+
+    public void setBitacora(ResultSet bitacora) {
+        this.bitacora = bitacora;
+    }
+
     public ResultSet TraerBitacora() {
         ResultSet rs = null;
         try {
@@ -135,17 +159,17 @@ public class MariaDBCon {
             System.out.println(statement);
 
             con.createStatement().execute(statement);
-            
+
             //DELETE TRIGGER
             String delete_trigger = "";
-            String deleteID = "CONCAT(\""+columnNames.get(0)+"=\",OLD."+columnNames.get(0)+")";
+            String deleteID = "CONCAT(\"" + columnNames.get(0) + "=\",OLD." + columnNames.get(0) + ")";
             delete_trigger += "\nCREATE TRIGGER " + tableName + "_after_delete AFTER DELETE ON " + tableName + " FOR EACH ROW BEGIN\n";
             delete_trigger += "INSERT INTO Bitacora( tabla,\n"
                     + "  accion,\n"
                     + "  atributos,\n"
                     + "	 NewDatos,\n"
                     + "	 OldDatos) "
-                    + "VALUES('" + tableName + "','DELETE FROM', '" + columns + "',"+deleteID+ ",CONCAT('VALUES (',";
+                    + "VALUES('" + tableName + "','DELETE FROM', '" + columns + "'," + deleteID + ",CONCAT('VALUES (',";
             String coso1 = "";
             for (int i = 0; i < columnNames.size(); i++) {
                 if (i != columnNames.size() - 1) {
@@ -174,7 +198,7 @@ public class MariaDBCon {
             delete_trigger += ", ')')); \n END";
             System.out.println(delete_trigger);
             con.createStatement().execute(delete_trigger);
-            
+
             //UPDATE TRIGGER
             String update_trigger = "";
             update_trigger += "\nCREATE TRIGGER " + tableName + "_after_update AFTER UPDATE ON " + tableName + " FOR EACH ROW BEGIN\n";
@@ -184,10 +208,10 @@ public class MariaDBCon {
                     + "	 NewDatos,\n"
                     + "	 OldDatos) "
                     + "VALUES('" + tableName + "','UPDATE ', '" + columns + "',CONCAT(";
-            update_trigger += coso +", ')'), CONCAT(" + coso1 +", ')')); \n END";
+            update_trigger += coso + ", ')'), CONCAT(" + coso1 + ", ')')); \n END";
             System.out.println(update_trigger);
             con.createStatement().execute(update_trigger);
-            
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -212,7 +236,6 @@ public class MariaDBCon {
 
     public void DetectarNuevaTabla() {
 
-        int originSize = tablas.size();
         ArrayList<String> newTablas = new ArrayList();
         ArrayList<String> triggerTablas = new ArrayList();
         TraerTablas(newTablas);
@@ -245,7 +268,11 @@ public class MariaDBCon {
                 String values = "'(";
                 for (int i = 0; i < columnNames.size(); i++) {
                     values += columnNames.get(i) + " ";
-                    values += columnTypes.get(i) + " ";
+                    if (columnTypes.get(i).contains("int")) {
+                        values += "int ";
+                    } else {
+                        values += columnTypes.get(i) + " ";
+                    }
                     if ("PRI".equals(columnKey.get(i))) {
                         values += "PRIMARY KEY ";
                     } else {
@@ -253,7 +280,7 @@ public class MariaDBCon {
                     }
 
                     if ("auto_increment".equals(extra.get(i))) {
-                        values += "AUTO_INCREMENT";
+                        values += "IDENTITY(1,1)";
                     }
                     if (i != columnNames.size() - 1) {
                         values += ",\n ";
@@ -276,6 +303,33 @@ public class MariaDBCon {
                 ps.executeQuery();
             } catch (SQLException ex) {
                 Logger.getLogger(MariaDBCon.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            CrearTrigger(triggerTabla);
+        }
+    }
+
+    public void CrearTablasSQLServer(ArrayList<String> tablas, SQLServerCon sqlcon) {
+        Connection SQLcon = sqlcon.getCon();
+        for (String tabla : tablas) {
+            if (!sqlcon.getTablas().contains(tabla)) {
+                try {
+                    ResultSet rs = null;
+                    try {
+                        PreparedStatement ps = con.prepareStatement(
+                                "Select * from Bitacora WHERE tabla ='" + tabla + "' AND accion = 'CREATE TABLE'");
+                        rs = ps.executeQuery();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    while (rs.next()) {
+                        Statement st = SQLcon.createStatement();
+                        String exe = "CREATE TABLE " + tabla + " " + rs.getString("atributos");
+                        System.out.println(exe);
+                        st.execute(exe);
+                    }
+                } catch (SQLException ex) {
+                    Logger.getLogger(MariaDBCon.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
     }

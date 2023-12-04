@@ -6,7 +6,9 @@
 package proyecto_2_tbd2;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -36,7 +38,7 @@ public class Gui extends javax.swing.JFrame {
         jScrollPane5 = new javax.swing.JScrollPane();
         jTable5 = new javax.swing.JTable();
         jScrollPane6 = new javax.swing.JScrollPane();
-        jTable6 = new javax.swing.JTable();
+        tabla1 = new javax.swing.JTable();
         jToggleButton11 = new javax.swing.JToggleButton();
         jToggleButton12 = new javax.swing.JToggleButton();
         jToggleButton13 = new javax.swing.JToggleButton();
@@ -93,7 +95,7 @@ public class Gui extends javax.swing.JFrame {
 
         jPanel4.add(jScrollPane5, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 80, 190, 240));
 
-        jTable6.setModel(new javax.swing.table.DefaultTableModel(
+        tabla1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null}
             },
@@ -101,7 +103,7 @@ public class Gui extends javax.swing.JFrame {
                 "Title 1"
             }
         ));
-        jScrollPane6.setViewportView(jTable6);
+        jScrollPane6.setViewportView(tabla1);
 
         jPanel4.add(jScrollPane6, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 80, 190, 240));
 
@@ -111,21 +113,31 @@ public class Gui extends javax.swing.JFrame {
 
         jToggleButton12.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         jToggleButton12.setText(">>");
+        jToggleButton12.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jToggleButton12ActionPerformed(evt);
+            }
+        });
         jPanel4.add(jToggleButton12, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 220, 70, 40));
 
         jToggleButton13.setText("Guardar");
+        jToggleButton13.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jToggleButton13ActionPerformed(evt);
+            }
+        });
         jPanel4.add(jToggleButton13, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 360, 100, 40));
 
         jToggleButton14.setText("Cancelar");
         jPanel4.add(jToggleButton14, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 360, 100, 40));
 
-        jToggleButton15.setText("jToggleButton15");
+        jToggleButton15.setText("REFRESH");
         jToggleButton15.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jToggleButton15ActionPerformed(evt);
             }
         });
-        jPanel4.add(jToggleButton15, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 360, -1, -1));
+        jPanel4.add(jToggleButton15, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 80, 90, -1));
 
         javax.swing.GroupLayout ReplicarLayout = new javax.swing.GroupLayout(Replicar.getContentPane());
         Replicar.getContentPane().setLayout(ReplicarLayout);
@@ -375,8 +387,35 @@ public class Gui extends javax.swing.JFrame {
     }//GEN-LAST:event_probarDestinoActionPerformed
 
     private void jToggleButton15ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton15ActionPerformed
-        MariaCon.CrearTrigger("teachers");
+        tablas.clear();
+        MariaCon.TraerTablas(tablas);
+        MariaCon.DetectarNuevaTabla();
+        tabla1.removeAll();
+        tabla1.setModel(TablaTablas());
     }//GEN-LAST:event_jToggleButton15ActionPerformed
+
+    private void jToggleButton12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton12ActionPerformed
+        MariaCon.CrearTablasSQLServer(tablas, SQLCon);
+    }//GEN-LAST:event_jToggleButton12ActionPerformed
+
+    private void jToggleButton13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton13ActionPerformed
+        
+    }//GEN-LAST:event_jToggleButton13ActionPerformed
+    public DefaultTableModel TablaTablas() {
+        DefaultTableModel model = new DefaultTableModel();
+        try {
+            model.addColumn("Tablas");
+            for (String tabla : tablas) {
+                Object[] row = new Object[1];
+                row[0] = tabla;
+                model.addRow(row);
+            }
+            return model;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return model;
+    }
 
     /**
      * @param args the command line arguments
@@ -414,6 +453,7 @@ public class Gui extends javax.swing.JFrame {
     }
     SQLServerCon SQLCon;
     MariaDBCon MariaCon;
+    ArrayList<String> tablas = new ArrayList();
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JDialog Replicar;
     private javax.swing.JPanel activoDestino;
@@ -452,7 +492,6 @@ public class Gui extends javax.swing.JFrame {
     private javax.swing.JTable jTable3;
     private javax.swing.JTable jTable4;
     private javax.swing.JTable jTable5;
-    private javax.swing.JTable jTable6;
     private javax.swing.JTextField jTextField11;
     private javax.swing.JTextField jTextField5;
     private javax.swing.JToggleButton jToggleButton1;
@@ -476,6 +515,7 @@ public class Gui extends javax.swing.JFrame {
     private javax.swing.JTextField portOrigen;
     private javax.swing.JToggleButton probarDestino;
     private javax.swing.JToggleButton probarOrigen;
+    private javax.swing.JTable tabla1;
     private javax.swing.JTextField userDestino;
     private javax.swing.JTextField userOrigen;
     // End of variables declaration//GEN-END:variables
