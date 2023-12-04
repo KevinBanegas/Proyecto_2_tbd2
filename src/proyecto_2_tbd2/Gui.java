@@ -399,7 +399,7 @@ public class Gui extends javax.swing.JFrame {
     }//GEN-LAST:event_jToggleButton12ActionPerformed
 
     private void jToggleButton13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton13ActionPerformed
-        
+        MariaCon.Migrar(SQLCon);
     }//GEN-LAST:event_jToggleButton13ActionPerformed
     public DefaultTableModel TablaTablas() {
         DefaultTableModel model = new DefaultTableModel();
