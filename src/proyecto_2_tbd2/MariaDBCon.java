@@ -84,7 +84,7 @@ public class MariaDBCon {
         TraerTablas(tablas);
         try {
 
-            CrearTablasSQLServer(tablas, sqlcon);
+            CrearTablasSQLServer(tablasMigrar, sqlcon);
             while (bitacora.next()) {
                 Statement st = sqlcon.getCon().createStatement();
                 String query = "";

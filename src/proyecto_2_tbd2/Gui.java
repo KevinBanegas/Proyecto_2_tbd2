@@ -446,7 +446,6 @@ public class Gui extends javax.swing.JFrame {
         ArrayList<String> tablasMigrar1 = new ArrayList();
         for (int i = 0; i < tabla2.getRowCount(); i++) {
             tablasMigrar1.add(tabla2.getValueAt(i,0).toString());
-            System.out.println(tabla2.getValueAt(i,0).toString());
         }
         MariaCon.Migrar(SQLCon,tablasMigrar1);
         JOptionPane.showMessageDialog(Replicar, "Bases de Datos Replicado");
