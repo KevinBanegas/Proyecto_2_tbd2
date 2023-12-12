@@ -63,6 +63,7 @@ public class SQLServerCon {
     }
 
     public void TraerTablas(ArrayList<String> table) {
+        table.clear();
         ResultSet rs = null;
         try {
             PreparedStatement ps = con.prepareStatement(

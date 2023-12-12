@@ -79,58 +79,61 @@ public class MariaDBCon {
         return rs;
     }
 
-    public void Migrar(SQLServerCon sqlcon) {
+    public void Migrar(SQLServerCon sqlcon, ArrayList<String> tablasMigrar) {
         bitacora = TraerBitacora();
         TraerTablas(tablas);
         try {
-            ResultSetMetaData metaData = bitacora.getMetaData();
-            for (int i = 1; i <= metaData.getColumnCount(); i++) {
-                System.out.print(metaData.getColumnName(i) + "      ");
-            }
-            System.out.println("");
+
+            CrearTablasSQLServer(tablas, sqlcon);
             while (bitacora.next()) {
                 Statement st = sqlcon.getCon().createStatement();
                 String query = "";
-                switch (bitacora.getString("accion")) {
-                    case "INSERT INTO": {
-                        String atr = bitacora.getString("atributos");
-                        atr = atr.substring(atr.indexOf(",")+1, atr.length());
-                        String nD = bitacora.getString("NewDatos");
-                        nD = nD.substring(nD.indexOf(",")+1, nD.length());
-                        query += "INSERT INTO " + bitacora.getString("tabla") + "("+atr + " VALUES (" +nD;
-                    }
-                    break;
-                    case "UPDATE ": {
-                        query += "UPDATE " + bitacora.getString("tabla") + " SET ";
-                        String atr = bitacora.getString("atributos");
-                        atr = atr.substring(1, atr.length() - 1);
-                        String nD = bitacora.getString("NewDatos");
-                        nD = nD.substring(1, nD.length() - 1);
-                        String oD = bitacora.getString("OldDatos");
-                        oD = oD.substring(1, oD.length() - 1);
-
-                        String todo = "";
-                        String[] atributes = atr.split(",");
-                        String[] newData = nD.split(",");
-                        String[] oldData = oD.split(",");
-                        for (int i = 1; i < atributes.length; i++) {
-                            todo += atributes[i] + "=" + newData[i];
-                            if (i != atributes.length-1) {
-                                todo += " ,";
-                            }
+                if (tablasMigrar.contains(bitacora.getString("tabla")) && !bitacora.getBoolean("replicado")) {
+                    switch (bitacora.getString("accion")) {
+                        case "INSERT INTO": {
+                            
+                            String atr = bitacora.getString("atributos");
+                            atr = atr.substring(atr.indexOf(",") + 1, atr.length());
+                            String nD = bitacora.getString("NewDatos");
+                            nD = nD.substring(nD.indexOf(",") + 1, nD.length());
+                            query += "INSERT INTO " + bitacora.getString("tabla") + "(" + atr + " VALUES (" + nD;
                         }
+                        break;
+                        case "UPDATE ": {
+                            query += "UPDATE " + bitacora.getString("tabla") + " SET ";
+                            String atr = bitacora.getString("atributos");
+                            atr = atr.substring(1, atr.length() - 1);
+                            String nD = bitacora.getString("NewDatos");
+                            nD = nD.substring(1, nD.length() - 1);
+                            String oD = bitacora.getString("OldDatos");
+                            oD = oD.substring(1, oD.length() - 1);
 
-                        query += todo + " WHERE " + atributes[0] + "=" + oldData[0];
+                            String todo = "";
+                            String[] atributes = atr.split(",");
+                            String[] newData = nD.split(",");
+                            String[] oldData = oD.split(",");
+                            for (int i = 1; i < atributes.length; i++) {
+                                todo += atributes[i] + "=" + newData[i];
+                                if (i != atributes.length - 1) {
+                                    todo += " ,";
+                                }
+                            }
 
+                            query += todo + " WHERE " + atributes[0] + "=" + oldData[0];
+
+                        }
+                        break;
+                        case "DELETE FROM": {
+                            query += "DELETE FROM " + bitacora.getString("tabla") + " WHERE " + bitacora.getString("NewDatos");
+                        }
+                        break;
                     }
-                    break;
-                    case "DELETE FROM": {
-                        query += "DELETE FROM " + bitacora.getString("tabla") + " WHERE " + bitacora.getString("NewDatos");
-                    }
-                    break;
+                    System.out.println(query);
+                    st.execute(query);
+                    Statement modBitacora = con.createStatement();
+                    String mod = "UPDATE Bitacora SET replicado = 1 WHERE id = " + bitacora.getInt("id");
+                    modBitacora.execute(mod);
                 }
-                System.out.println(query);
-                st.execute(query);
             }
         } catch (SQLException ex) {
             Logger.getLogger(MariaDBCon.class.getName()).log(Level.SEVERE, null, ex);
@@ -167,7 +170,7 @@ public class MariaDBCon {
                     + "  accion,\n"
                     + "  atributos,\n"
                     + "	 NewDatos,\n"
-                    + "	 OldDatos) "
+                    + "	 OldDatos, replicado) "
                     + "VALUES('" + tableName + "','INSERT INTO', '" + columns + "', CONCAT('VALUES (',";
             String coso = "";
             for (int i = 0; i < columnNames.size(); i++) {
@@ -195,7 +198,7 @@ public class MariaDBCon {
 
             }
             statement += coso;
-            statement += ", ')'), NULL); \n END";
+            statement += ", ')'), NULL,'0'); \n END";
             System.out.println(statement);
 
             con.createStatement().execute(statement);
@@ -208,7 +211,7 @@ public class MariaDBCon {
                     + "  accion,\n"
                     + "  atributos,\n"
                     + "	 NewDatos,\n"
-                    + "	 OldDatos) "
+                    + "	 OldDatos, replicado) "
                     + "VALUES('" + tableName + "','DELETE FROM', '" + columns + "'," + deleteID + ",CONCAT('VALUES (',";
             String coso1 = "";
             for (int i = 0; i < columnNames.size(); i++) {
@@ -235,7 +238,7 @@ public class MariaDBCon {
                 }
             }
             delete_trigger += coso1;
-            delete_trigger += ", ')')); \n END";
+            delete_trigger += ", ')'),'0'); \n END";
             System.out.println(delete_trigger);
             con.createStatement().execute(delete_trigger);
 
@@ -246,9 +249,9 @@ public class MariaDBCon {
                     + "  accion,\n"
                     + "  atributos,\n"
                     + "	 NewDatos,\n"
-                    + "	 OldDatos) "
+                    + "	 OldDatos, replicado) "
                     + "VALUES('" + tableName + "','UPDATE ', '" + columns + "',CONCAT('(',";
-            update_trigger += coso + ", ')'), CONCAT('('," + coso1 + ", ')')); \n END";
+            update_trigger += coso + ", ')'), CONCAT('('," + coso1 + ", ')'),'0'); \n END";
             System.out.println(update_trigger);
             con.createStatement().execute(update_trigger);
 
@@ -258,6 +261,7 @@ public class MariaDBCon {
     }
 
     public void TraerTablas(ArrayList<String> table) {
+        table.clear();
         ResultSet rs = null;
         try {
             PreparedStatement ps = con.prepareStatement(
@@ -276,7 +280,7 @@ public class MariaDBCon {
 
     public void DetectarNuevaTabla() {
         bitacora = TraerBitacora();
-        
+
         ArrayList<String> newTablas = new ArrayList();
         ArrayList<String> triggerTablas = new ArrayList();
         TraerTablas(newTablas);
@@ -284,6 +288,7 @@ public class MariaDBCon {
             for (String B : newTablas) {
                 if (!tablas.contains(B)) {
                     triggerTablas.add(B);
+                    System.out.println(B + " detecto");
                 }
             }
         }
@@ -336,8 +341,8 @@ public class MariaDBCon {
                         + "  accion,\n"
                         + "  atributos,\n"
                         + "	 NewDatos,\n"
-                        + "	 OldDatos) "
-                        + " VALUES('" + triggerTabla + "', 'CREATE TABLE'," + values + ",NULL,NULL)";
+                        + "	 OldDatos, replicado) "
+                        + " VALUES('" + triggerTabla + "', 'CREATE TABLE'," + values + ",NULL,NULL,'0')";
 
                 System.out.println(insertTable);
                 PreparedStatement ps = con.prepareStatement(insertTable);
@@ -364,15 +369,20 @@ public class MariaDBCon {
                         e.printStackTrace();
                     }
                     while (rs.next()) {
+
                         Statement st = SQLcon.createStatement();
                         String exe = "CREATE TABLE " + tabla + " " + rs.getString("atributos");
                         System.out.println(exe);
                         st.execute(exe);
+                        Statement modBitacora = con.createStatement();
+                        String mod = "UPDATE Bitacora SET replicado = 1 WHERE id = " + rs.getInt("id");
+                        modBitacora.execute(mod);
                     }
                 } catch (SQLException ex) {
                     Logger.getLogger(MariaDBCon.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
+            sqlcon.TraerTablas(sqlcon.getTablas());
         }
     }
 }
