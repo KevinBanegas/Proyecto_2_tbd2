@@ -28,6 +28,9 @@ public class Gui extends javax.swing.JFrame {
         m.addColumn("Tabla");
         tabla1.setModel(m);
         tabla2.setModel(m);
+        j = new Job(jTextArea1);
+        Thread t = new Thread(j);
+        t.start();
     }
 
     /**
@@ -51,6 +54,11 @@ public class Gui extends javax.swing.JFrame {
         jToggleButton13 = new javax.swing.JToggleButton();
         jToggleButton14 = new javax.swing.JToggleButton();
         jToggleButton15 = new javax.swing.JToggleButton();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTextArea1 = new javax.swing.JTextArea();
+        jLabel5 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
@@ -88,7 +96,7 @@ public class Gui extends javax.swing.JFrame {
         jLabel6.setForeground(new java.awt.Color(0, 0, 0));
         jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel6.setText("Tablas BD Origen");
-        jPanel4.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 20, 220, 40));
+        jPanel4.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 20, 220, 40));
 
         tabla2.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -100,7 +108,7 @@ public class Gui extends javax.swing.JFrame {
         ));
         jScrollPane5.setViewportView(tabla2);
 
-        jPanel4.add(jScrollPane5, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 80, 190, 240));
+        jPanel4.add(jScrollPane5, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 100, 190, 240));
 
         tabla1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -112,7 +120,7 @@ public class Gui extends javax.swing.JFrame {
         ));
         jScrollPane6.setViewportView(tabla1);
 
-        jPanel4.add(jScrollPane6, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 80, 190, 240));
+        jPanel4.add(jScrollPane6, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 100, 190, 240));
 
         jToggleButton11.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         jToggleButton11.setText("<<");
@@ -121,7 +129,7 @@ public class Gui extends javax.swing.JFrame {
                 jToggleButton11ActionPerformed(evt);
             }
         });
-        jPanel4.add(jToggleButton11, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 160, 70, 40));
+        jPanel4.add(jToggleButton11, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 160, 70, 40));
 
         jToggleButton12.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         jToggleButton12.setText(">>");
@@ -130,7 +138,7 @@ public class Gui extends javax.swing.JFrame {
                 jToggleButton12ActionPerformed(evt);
             }
         });
-        jPanel4.add(jToggleButton12, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 220, 70, 40));
+        jPanel4.add(jToggleButton12, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 220, 70, 40));
 
         jToggleButton13.setText("Guardar");
         jToggleButton13.addActionListener(new java.awt.event.ActionListener() {
@@ -138,7 +146,7 @@ public class Gui extends javax.swing.JFrame {
                 jToggleButton13ActionPerformed(evt);
             }
         });
-        jPanel4.add(jToggleButton13, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 360, 100, 40));
+        jPanel4.add(jToggleButton13, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 360, 100, 40));
 
         jToggleButton14.setText("Cancelar");
         jToggleButton14.addActionListener(new java.awt.event.ActionListener() {
@@ -146,7 +154,7 @@ public class Gui extends javax.swing.JFrame {
                 jToggleButton14ActionPerformed(evt);
             }
         });
-        jPanel4.add(jToggleButton14, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 360, 100, 40));
+        jPanel4.add(jToggleButton14, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 360, 100, 40));
 
         jToggleButton15.setText("REFRESH");
         jToggleButton15.addActionListener(new java.awt.event.ActionListener() {
@@ -154,7 +162,29 @@ public class Gui extends javax.swing.JFrame {
                 jToggleButton15ActionPerformed(evt);
             }
         });
-        jPanel4.add(jToggleButton15, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 80, 90, -1));
+        jPanel4.add(jToggleButton15, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 80, 90, -1));
+
+        jLabel1.setFont(new java.awt.Font("Dialog", 0, 24)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel1.setText("Job");
+        jPanel4.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 60, -1, -1));
+
+        jLabel3.setBackground(new java.awt.Color(0, 0, 0));
+        jLabel3.setFont(new java.awt.Font("Dialog", 0, 24)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel3.setText("Sin Replicar");
+        jPanel4.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 60, -1, -1));
+
+        jTextArea1.setColumns(20);
+        jTextArea1.setRows(5);
+        jScrollPane1.setViewportView(jTextArea1);
+
+        jPanel4.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 100, 100, 180));
+
+        jLabel5.setFont(new java.awt.Font("Dialog", 0, 24)); // NOI18N
+        jLabel5.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel5.setText("Replicado");
+        jPanel4.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 60, -1, -1));
 
         javax.swing.GroupLayout ReplicarLayout = new javax.swing.GroupLayout(Replicar.getContentPane());
         Replicar.getContentPane().setLayout(ReplicarLayout);
@@ -552,6 +582,7 @@ public class Gui extends javax.swing.JFrame {
     MariaDBCon MariaCon;
     ArrayList<String> tablas = new ArrayList();
     ArrayList<String> tablasMigrar = new ArrayList();
+    Job j = new Job();
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JDialog Replicar;
     private javax.swing.JPanel activoDestino;
@@ -560,6 +591,7 @@ public class Gui extends javax.swing.JFrame {
     private javax.swing.JTextField contraOrigen;
     private javax.swing.JTextField instanciaDestino;
     private javax.swing.JTextField instanciaOrigen;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
@@ -571,12 +603,16 @@ public class Gui extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel22;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane6;
+    private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTextField jTextField11;
     private javax.swing.JTextField jTextField5;
     private javax.swing.JToggleButton jToggleButton11;
